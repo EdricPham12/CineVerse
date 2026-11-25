@@ -275,6 +275,8 @@ const paymentResult = async (values) =>
       attempt.status = paid ? "REVIEW_REQUIRED" : "FAILED";
       if (b?.status === "AWAITING_PAYMENT")
         b.status = paid ? "PAYMENT_REVIEW" : "CANCELLED";
+      else if (paid && b && ["CANCELLED", "EXPIRED"].includes(b.status))
+        b.status = "PAYMENT_REVIEW";
     }
     persist();
     return { code: "00", message: "Processed", bookingId: attempt.bookingId };
@@ -689,7 +691,8 @@ const route = async (req, res) => {
           );
         expire();
         if (match[2] === "cancel") {
-          if (b.status !== "PENDING") throw error(409, "Không thể hủy đơn này");
+          if (!["PENDING", "AWAITING_PAYMENT"].includes(b.status))
+            throw error(409, "Chỉ có thể hủy đơn chưa thanh toán");
           b.status = "CANCELLED";
           persist();
           return json(res, 200, bookingView(b));

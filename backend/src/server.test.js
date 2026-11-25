@@ -165,6 +165,36 @@ test("checkout issues exactly one ticket after signed payment and check-in is on
     );
     assert.equal(barcode.status, 200);
     assert.equal(barcode.headers.get("content-type"), "image/png");
+    const unpaid = await req(
+      "/bookings/checkout",
+      "POST",
+      { showtimeId: show.id, seatIds: ["A2"] },
+      token,
+    );
+    assert.equal(unpaid.status, 201);
+    const unpaidId = unpaid.data.booking.id;
+    assert.equal(
+      (await req(`/bookings/${unpaidId}/cancel`, "POST", {}, token)).data
+        .status,
+      "CANCELLED",
+    );
+    assert.equal(
+      (await req(`/showtimes/${show.id}/seats`)).data.seats.find((s) => s.id === "A2").status,
+      "AVAILABLE",
+    );
+    const lateFields = Object.fromEntries(new URL(unpaid.data.paymentUrl).searchParams);
+    delete lateFields.vnp_SecureHash;
+    lateFields.vnp_ResponseCode = "00";
+    lateFields.vnp_TransactionStatus = "00";
+    const lateQuery = Object.keys(lateFields)
+      .sort()
+      .map((k) => `${k}=${encodeURIComponent(lateFields[k]).replace(/%20/g, "+")}`)
+      .join("&");
+    const lateHash = crypto.createHmac("sha512", "test-hash-secret").update(lateQuery).digest("hex");
+    await req(`/payment/vnpay-ipn?${lateQuery}&vnp_SecureHash=${lateHash}`);
+    const review = (await req(`/bookings/${unpaidId}`, "GET", null, token)).data;
+    assert.equal(review.status, "PAYMENT_REVIEW");
+    assert.equal(review.tickets.length, 0);
   } finally {
     child.kill();
     fs.rmSync(dir, { recursive: true, force: true });

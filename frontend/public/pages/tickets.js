@@ -49,6 +49,28 @@ async function ticketPage() {
     e.preventDefault();
     navigate("bookings");
   };
+  if (b.status === "AWAITING_PAYMENT") {
+    document.querySelector(".ticket-sheet").insertAdjacentHTML(
+      "beforeend",
+      `<div class="ticket-pending-actions"><p>Chưa thanh toán? Bạn có thể quay lại hoặc hủy đơn để chọn lại ghế. Nếu VNPay đã trừ tiền, hãy chờ kết quả đối soát.</p><div><button class="outline" id="pending-back">← Vé của tôi</button><button class="cancel-button" id="pending-cancel">Hủy đơn chưa thanh toán</button></div></div>`,
+    );
+    $("#pending-back").onclick = () => navigate("bookings");
+    $("#pending-cancel").onclick = async (e) => {
+      const button = e.currentTarget;
+      button.disabled = true;
+      try {
+        await api(`/bookings/${encodeURIComponent(b.id)}/cancel`, {
+          method: "POST",
+          body: "{}",
+        });
+        toast("Đã hủy đơn chưa thanh toán");
+        navigate("ticket");
+      } catch (err) {
+        toast(err);
+        button.disabled = false;
+      }
+    };
+  }
   for (const img of document.querySelectorAll("[data-barcode]")) {
     try {
       const response = await fetch(

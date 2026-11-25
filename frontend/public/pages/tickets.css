@@ -259,6 +259,20 @@
   font-weight: 800;
 }
 
+.ticket-pending-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed #cbd0d6;
+}
+.ticket-pending-actions p { margin: 0 0 14px; color: #5b6470; font-size: 12px; line-height: 1.7; }
+.ticket-pending-actions > div { display: flex; flex-wrap: wrap; gap: 10px; }
+.ticket-pending-actions .outline { color: #26313d; border-color: #a9b1bd; }
+.cancel-button {
+  border: 1px solid #b94c46; border-radius: 10px; background: #fff;
+  color: #a83c38; padding: 12px 18px; font-weight: 700;
+}
+.cancel-button:hover { background: #fff0ee; }
+
 @media (max-width: 700px) {
   .ticket-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ticket-order { grid-template-columns: 1fr 1fr; }

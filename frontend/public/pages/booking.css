@@ -1,4 +1,19 @@
 /* Kiểm tra đơn trước khi khách chuyển sang VNPay. */
+.legend { margin: 24px 0 4px; justify-content: flex-start; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend-key { width: 15px; height: 15px; display: inline-block; border-radius: 4px; border: 1px solid #536078; }
+.legend-key.available { background: #283244; }
+.legend-key.selected-key { background: #f2b84f; border-color: #f2b84f; }
+.legend-key.vip-key { background: #283244; border-color: #c69a51; }
+.legend-key.sold-key { background: #45495a; border-color: #45495a; }
+
+.review-panel:first-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+  border-top: 3px solid #d45c49;
+}
+.review-panel:first-child h2 { grid-column: 1 / -1; }
 .review-heading {
   margin: 36px 0 24px;
 }
@@ -28,6 +43,13 @@
   border-bottom: 1px solid #343a48;
   font-size: 14px;
 }
+.review-panel:first-child .review-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.review-panel:first-child .review-row strong { text-align: left; }
 
 .review-row span {
   flex: none;
@@ -58,6 +80,7 @@
 }
 
 @media (max-width: 550px) {
+  .review-panel:first-child { grid-template-columns: 1fr; }
   .review-row { flex-direction: column; gap: 5px; }
   .review-row strong { text-align: left; }
 }
